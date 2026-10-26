@@ -1,0 +1,11 @@
+{
+  "title": "Confeitaria Graziela Pires",
+  "description": "Showcase artisanal cakes and sweets with a sophisticated portfolio, allowing users to explore options and request personalized quotes via WhatsApp.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
