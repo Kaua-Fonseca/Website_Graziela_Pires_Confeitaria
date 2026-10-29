@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 type View = "home" | "catalogo" | "produto" | "showroom" | "orcamento";
