@@ -5,6 +5,7 @@ import { api } from "@/components/admin/api";
 import { Loading, PageHead, useToast } from "@/components/admin/ui";
 
 type Stats = {
+  whatsapp: boolean;
   customers: { total: number; active: number; lastWeek: number };
   quotes: Record<string, number>;
   products: { total: number; active: number };
@@ -22,6 +23,12 @@ export default function Dashboard() {
   return (
     <>
       <PageHead title="Dashboard" sub="Resumo do site." />
+      {!s.whatsapp && (
+        <div className="adm-notice" role="alert">
+          <span><strong>Defina o seu WhatsApp.</strong> Sem ele, os clientes não conseguem enviar o orçamento direto para você.</span>
+          <Link className="adm-btn small" href="/admin/conteudo">Definir agora</Link>
+        </div>
+      )}
       <div className="adm-cards">
         <Card label="Clientes cadastrados" value={s.customers.total} note={`${s.customers.active} ativos · ${s.customers.lastWeek} novos em 7 dias`} href="/admin/clientes" />
         <Card label="Orçamentos novos" value={s.quotes.novo ?? 0} note={`${totalQuotes} no total`} href="/admin/orcamentos" accent />

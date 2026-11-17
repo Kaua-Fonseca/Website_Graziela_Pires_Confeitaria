@@ -1,4 +1,5 @@
 "use client";
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 
 /* ---------- Toasts ---------- */
@@ -67,10 +68,13 @@ export function Confirm({ title, message, confirmLabel = "Excluir", typeToConfir
 
 export const Loading = () => <p className="adm-muted adm-loading">Carregando…</p>;
 
+let adminNavs = 0;
+export const markAdminNav = () => { adminNavs++; };
+
 export function PageHead({ title, sub, children }: { title: string; sub?: string; children?: ReactNode }) {
   return (
     <div className="adm-pagehead">
-      <div><h1>{title}</h1>{sub && <p className="adm-muted">{sub}</p>}</div>
+      <div><AdminBack /><h1>{title}</h1>{sub && <p className="adm-muted">{sub}</p>}</div>
       {children && <div className="adm-pagehead-actions">{children}</div>}
     </div>
   );
@@ -79,5 +83,17 @@ export function PageHead({ title, sub, children }: { title: string; sub?: string
 export function Switch({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <button type="button" role="switch" aria-checked={checked} aria-label={label} className={`adm-switch ${checked ? "on" : ""}`} onClick={() => onChange(!checked)}><i /></button>
+  );
+}
+
+/** Voltar para a tela anterior do painel; se não houver, para o dashboard. Não aparece no dashboard. */
+function AdminBack() {
+  const path = usePathname();
+  const router = useRouter();
+  if (path === "/admin") return null;
+  return (
+    <button type="button" className="adm-back-btn" onClick={() => (adminNavs > 1 ? router.back() : router.push("/admin"))}>
+      ← Voltar
+    </button>
   );
 }

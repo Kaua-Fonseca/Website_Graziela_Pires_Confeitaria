@@ -37,7 +37,9 @@ export function Catalog({ go, initial }: { go: GoFn; initial?: string }) {
           <span>{filtered.length} {filtered.length === 1 ? "criação" : "criações"}</span>
           <small>Valores iniciais sujeitos à personalização</small>
         </div>
-        {filtered.length === 0 && ready ? (
+        {!ready ? (
+          <div className="empty-state" aria-busy="true"><p>Carregando…</p></div>
+        ) : filtered.length === 0 ? (
           <div className="empty-state">
             <p>Nenhuma criação encontrada.</p>
             <Button variant="secondary" onClick={() => { setCategory("todos"); setQuery(""); }}>Limpar filtros</Button>

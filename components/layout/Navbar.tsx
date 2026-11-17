@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { GoFn, View } from "@/lib/types";
 import type { Route } from "@/lib/router";
 import { STATIC, useSite } from "@/lib/site";
@@ -17,6 +17,12 @@ export function Navbar({ go, route }: { go: GoFn; route: Route }) {
     ...(on("page.showroom") ? [{ label: "Showroom", view: "showroom" as View }] : []),
     ...(on("journey") || on("about") ? [{ label: "Como funciona", view: "home" as View, anchor: "processo", secondary: true }] : []),
   ];
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
   const isActive = (v: View, a?: string) => route.view === v && (route.anchor ?? undefined) === a;
   const nav = (v: View, a?: string) => { go(v, a); setOpen(false); };
 

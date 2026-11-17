@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { withAdmin } from "@/lib/server/auth";
-import { validateField, loadSite } from "@/lib/server/content";
+import { validateField, normalizeField, loadSite } from "@/lib/server/content";
 import { db } from "@/lib/server/db";
 import { fail, isResponse, json, parse } from "@/lib/server/http";
 
@@ -16,6 +16,7 @@ export const PUT = withAdmin(async (req) => {
     const err = validateField(k, v);
     if (err) return fail(err, 422);
   }
+  for (const k of Object.keys(b.values)) b.values[k] = normalizeField(k, b.values[k]);
   const client = await db().connect();
   try {
     await client.query("BEGIN");
