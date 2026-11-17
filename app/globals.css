@@ -553,3 +553,7 @@ input, select, textarea { font-size: 16px; }
 
 @media (max-width: 760px) { .final-cta .title br { display: none; } }
 .loading-page { min-height: 100svh; background: var(--cream); }
+.quote-preview { width: 100%; margin: 0; padding: 18px 20px; white-space: pre-wrap; word-break: break-word; font: inherit; font-size: .9rem; line-height: 1.6; color: var(--brown); background: var(--paper); border-left: 3px solid var(--olive); }
+.quote-done .button { max-width: 100%; text-align: center; }
+
+@media (max-width: 760px) { .button-ghost { min-height: 44px; } }

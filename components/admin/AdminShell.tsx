@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { ToastProvider } from "./ui";
+import { markAdminNav, ToastProvider } from "./ui";
 
 const NAV = [
   ["/admin", "Dashboard"],
@@ -17,7 +17,7 @@ export function AdminShell({ name, children }: { name: string; children: ReactNo
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  useEffect(() => setOpen(false), [path]);
+  useEffect(() => { setOpen(false); markAdminNav(); }, [path]);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });

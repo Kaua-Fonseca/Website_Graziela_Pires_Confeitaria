@@ -200,3 +200,7 @@
 .adm-login .adm-btn { min-height: 48px; }
 .adm-back { text-align: center; color: var(--olive-dark); font-weight: 600; text-decoration: none; padding: 8px; }
 .adm-login .adm-muted { color: #705d4e; }
+
+.adm-back-btn { display: inline-flex; align-items: center; min-height: 44px; margin: 0 0 6px -4px; padding: 0 4px; border: 0; background: none; color: var(--adm-muted, #7a6551); font: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; }
+.adm-back-btn:hover { color: inherit; }
+.adm-notice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; padding: 14px 18px; background: #fbefd5; border-left: 4px solid #d19a2a; color: #5a4210; }

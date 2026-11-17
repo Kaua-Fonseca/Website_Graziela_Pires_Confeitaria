@@ -21,3 +21,15 @@ export function toHash(view: View, anchor?: string, param?: string): string {
   if (view === "home") return anchor ? `#/${anchor}` : "#/";
   return `#/${view}${param ? `/${encodeURIComponent(param)}` : ""}`;
 }
+
+// Pilha de navegação interna: o "Voltar" só usa o histórico do navegador se a
+// página anterior for deste site (quem chegou por link direto vai para a tela de reserva).
+const stack: string[] = [];
+export function trackNav(hash: string) {
+  const h = hash || "#/";
+  if (stack.length === 0) stack.push(h);
+  else if (stack[stack.length - 1] === h) return;
+  else if (stack[stack.length - 2] === h) stack.pop();
+  else stack.push(h);
+}
+export const canGoBack = () => stack.length > 1;

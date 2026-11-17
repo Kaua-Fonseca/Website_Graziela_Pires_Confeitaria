@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { GoFn } from "@/lib/types";
-import { parseHash, toHash, type Route } from "@/lib/router";
+import { parseHash, toHash, trackNav, type Route } from "@/lib/router";
 import { SiteProvider, useSite } from "@/lib/site";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
@@ -16,11 +16,12 @@ import { QuotePage } from "@/components/pages/QuotePage";
 import { Showroom } from "@/components/pages/Showroom";
 
 function Shell() {
-  const { on } = useSite();
+  const { on, user, ready } = useSite();
   const [route, setRoute] = useState<Route>({ view: "home" });
   const [token, setToken] = useState<string | undefined>();
 
   const apply = useCallback((r: Route) => {
+    trackNav(window.location.hash);
     if (r.token) {
       // o token de redefinição sai da barra de endereço (histórico) assim que é lido
       setToken(r.token);
@@ -50,6 +51,10 @@ function Shell() {
   // páginas desativadas pela administradora voltam para o início
   let view = route.view;
   if ((view === "showroom" && !on("page.showroom")) || (view === "catalogo" && !on("page.catalog"))) view = "home";
+
+  // logado não precisa de login/cadastro; deslogado não vê a conta. Troca a tela sem mexer no histórico (evita ciclo no Voltar).
+  if (ready && user && (view === "entrar" || view === "cadastro")) view = "conta";
+  if (ready && !user && view === "conta") view = "entrar";
 
   return (
     <div className="app">

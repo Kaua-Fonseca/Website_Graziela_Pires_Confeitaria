@@ -25,12 +25,11 @@ function Shell({ title, sub, go, children }: { title: string; sub?: string; go: 
 const errMsg = (e: unknown) => (e instanceof Error && !/fetch|json/i.test(e.message) ? e.message : "Não foi possível concluir. Tente novamente.");
 
 export function LoginPage({ go }: { go: GoFn }) {
-  const { setUser, user } = useSite();
+  const { setUser } = useSite();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  useEffect(() => { if (user) go("conta"); }, [user]); // eslint-disable-line
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true); setError("");
@@ -145,14 +144,13 @@ export function ResetPage({ go, token }: { go: GoFn; token?: string }) {
 }
 
 export function AccountPage({ go }: { go: GoFn }) {
-  const { user, setUser, ready } = useSite();
+  const { user, setUser } = useSite();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [msg, setMsg] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
   const [pw, setPw] = useState({ current: "", next: "", confirm: "" });
   const [pwMsg, setPwMsg] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
 
-  useEffect(() => { if (ready && !user) go("entrar"); }, [ready, user]); // eslint-disable-line
   useEffect(() => { if (user) { setName(user.name); setPhone(user.phone ?? ""); } }, [user]);
   if (!user) return <main className="auth-page"><div className="auth-card"><p>Carregando…</p></div></main>;
 

@@ -9,7 +9,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Title } from "@/components/ui/Title";
 
 export function Showroom({ go }: { go: GoFn }) {
-  const { products, categories, setDraft } = useSite();
+  const { products, categories, setDraft, ready } = useSite();
   const [filter, setFilter] = useState("todos");
   const [selected, setSelected] = useState<Product | null>(null);
   const shown = filter === "todos" ? products : products.filter((x) => x.categorySlug === filter);
@@ -32,6 +32,7 @@ export function Showroom({ go }: { go: GoFn }) {
             <Button key={cat.slug} variant="ghost" className={filter === cat.slug ? "selected" : ""} onClick={() => setFilter(cat.slug)}>{cat.name}</Button>
           ))}
         </div>
+        {!ready ? <div className="empty-state" aria-busy="true"><p>Carregando…</p></div> : (
         <div className="masonry">
           {shown.map((item, index) => (
             <button className={`masonry-item masonry-${index % 4}`} key={item.slug} onClick={() => setSelected(item)}>
@@ -40,6 +41,7 @@ export function Showroom({ go }: { go: GoFn }) {
             </button>
           ))}
         </div>
+        )}
       </main>
       {selected && (
         <div className="modal-backdrop" onClick={() => setSelected(null)}>

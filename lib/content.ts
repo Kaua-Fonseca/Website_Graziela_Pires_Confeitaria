@@ -41,7 +41,7 @@ export const CONTENT_FIELDS: ContentField[] = [
   { key: "about.signature", group: "Sobre a confeitaria", label: "Assinatura", default: "Graziela Pires" },
   { key: "about.image", group: "Sobre a confeitaria", label: "Imagem", kind: "image", default: "" },
 
-  { key: "contact.whatsapp", group: "Contato", label: "WhatsApp (só números, com DDI e DDD. Ex.: 5545912345678)", default: "" },
+  { key: "contact.whatsapp", group: "Contato", label: "WhatsApp que recebe os orçamentos (DDD + número. Ex.: 45 91234-5678)", default: "" },
   { key: "contact.email", group: "Contato", label: "E-mail de contato", default: "" },
   { key: "contact.city", group: "Contato", label: "Cidade / estado", default: "Foz do Iguaçu — Paraná" },
   { key: "contact.hours", group: "Contato", label: "Horário de atendimento", default: "Ter a Sáb · 9h às 18h" },
