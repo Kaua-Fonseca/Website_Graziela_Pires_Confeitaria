@@ -1,18 +1,19 @@
 import { useState } from "react";
 import type { GoFn } from "@/lib/types";
-import { products } from "@/data/products";
+import { useSite } from "@/lib/site";
 import { ProductCard } from "@/components/sections/ProductCard";
+import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/Button";
-import { Icon } from "@/components/ui/Icon";
 import { PageHero } from "@/components/ui/PageHero";
 
-const tabs = ["Todos", "Naked Cake", "Bolos Personalizados", "Doces", "Cupcakes"];
-const filterLabels = ["Tamanho", "Faixa de preço", "Sabor", "Decoração"];
-
-export function Catalog({ go }: { go: GoFn }) {
-  const [category, setCategory] = useState("Todos");
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const filtered = category === "Todos" ? products : products.filter((p) => p.category === category);
+export function Catalog({ go, initial }: { go: GoFn; initial?: string }) {
+  const { products, categories, ready } = useSite();
+  const [category, setCategory] = useState(initial ?? "todos");
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const filtered = products.filter(
+    (p) => (category === "todos" || p.categorySlug === category) && (!q || `${p.name} ${p.detail}`.toLowerCase().includes(q)),
+  );
   return (
     <>
       <PageHero
@@ -21,34 +22,31 @@ export function Catalog({ go }: { go: GoFn }) {
         text="Explore sabores, estilos e possibilidades. Tudo pode ser personalizado para o seu momento."
       />
       <main className="catalog-page">
+        <BackButton onFallback={() => go("home")} />
         <div className="filter-tabs">
-          {tabs.map((item) => (
-            <Button key={item} variant="ghost" className={category === item ? "selected" : ""} onClick={() => setCategory(item)}>{item}</Button>
+          <Button variant="ghost" className={category === "todos" ? "selected" : ""} onClick={() => setCategory("todos")}>Todos</Button>
+          {categories.map((cat) => (
+            <Button key={cat.slug} variant="ghost" className={category === cat.slug ? "selected" : ""} onClick={() => setCategory(cat.slug)}>{cat.name}</Button>
           ))}
-          <Button variant="secondary" onClick={() => setFiltersOpen(!filtersOpen)}>Filtros <Icon name="chevron" /></Button>
         </div>
-        {filtersOpen && (
-          <div className="filter-panel">
-            {filterLabels.map((label) => (
-              <label key={label}>
-                <span>{label}</span>
-                <select defaultValue="">
-                  <option value="" disabled>Todos</option>
-                  <option>Clássico</option>
-                  <option>Personalizado</option>
-                </select>
-              </label>
-            ))}
-            <Button>Aplicar filtros</Button>
-          </div>
-        )}
+        <label className="catalog-search">
+          <span className="sr-only">Buscar produto</span>
+          <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por nome ou descrição" />
+        </label>
         <div className="catalog-meta">
-          <span>{filtered.length} criações</span>
+          <span>{filtered.length} {filtered.length === 1 ? "criação" : "criações"}</span>
           <small>Valores iniciais sujeitos à personalização</small>
         </div>
-        <div className="product-grid">
-          {filtered.map((product) => <ProductCard key={product.name} product={product} go={go} />)}
-        </div>
+        {filtered.length === 0 && ready ? (
+          <div className="empty-state">
+            <p>Nenhuma criação encontrada.</p>
+            <Button variant="secondary" onClick={() => { setCategory("todos"); setQuery(""); }}>Limpar filtros</Button>
+          </div>
+        ) : (
+          <div className="product-grid">
+            {filtered.map((product) => <ProductCard key={product.slug} product={product} go={go} />)}
+          </div>
+        )}
       </main>
     </>
   );

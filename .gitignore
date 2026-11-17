@@ -17,3 +17,6 @@ logs/
 # Platform-managed agent state
 /.plugins/
 /.opencode-skills/
+
+# imagens enviadas pelo painel
+/uploads/

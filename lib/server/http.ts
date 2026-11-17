@@ -41,11 +41,4 @@ export async function parse<T>(req: Request, schema: ZodType<T>): Promise<T | Re
 
 export const isResponse = (v: unknown): v is Response => v instanceof Response;
 
-export function slugify(s: string): string {
-  return s
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
+export { slugify } from "../slug";

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Title } from "@/components/ui/Title";
+import { useSite } from "@/lib/site";
 
 const gallery = [
   { image: photos.floral, name: "Floral orgânico", text: "Flores naturais, volumes delicados e uma composição criada para o seu evento." },
@@ -15,6 +16,7 @@ const gallery = [
 const tags = ["Floral", "Pasta americana", "Pinturas", "Cores", "Glitter", "Sabores"];
 
 export function CustomCakes({ go }: { go: GoFn }) {
+  const { setDraft } = useSite();
   const [modal, setModal] = useState<number | null>(null);
   return (
     <section className="section custom-cakes">
@@ -46,7 +48,7 @@ export function CustomCakes({ go }: { go: GoFn }) {
               <span className="eyebrow">INSPIRAÇÃO</span>
               <Title level={2}>{gallery[modal].name}</Title>
               <p>{gallery[modal].text}</p>
-              <Button onClick={() => { setModal(null); go("orcamento"); }}>Quero algo parecido <Icon name="arrow" size={18} /></Button>
+              <Button onClick={() => { setDraft({ productType: "Bolos Personalizados", idea: `Quero algo parecido com: ${gallery[modal].name}` }); setModal(null); go("orcamento"); }}>Quero algo parecido <Icon name="arrow" size={18} /></Button>
             </div>
           </div>
         </div>

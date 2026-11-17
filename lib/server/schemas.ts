@@ -23,3 +23,7 @@ export const SELECT = `SELECT p.id, p.slug, p.name, p.category_id AS "categoryId
   p.price_label AS price, p.detail, p.active, p.position, p.updated_at AS "updatedAt"
   FROM products p`;
 
+
+export const emailSchema = z.string().trim().toLowerCase().email("E-mail inválido").max(200);
+export const passwordSchema = z.string().min(10, "A senha precisa ter pelo menos 10 caracteres").max(128);
+export const phoneSchema = z.string().trim().regex(/^[\d\s()+-]{8,20}$/, "Telefone inválido");

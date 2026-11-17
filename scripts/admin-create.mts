@@ -1,35 +1,71 @@
 import "./env";
-import { createInterface } from "node:readline";
+import { createInterface } from "node:readline/promises";
 import { db } from "../lib/server/db";
 import { hashPassword } from "../lib/server/auth-hash";
 
-// uso: npm run admin:create -- email@exemplo.com "Nome"   (a senha é pedida sem eco)
-const [email, name = "Administrador"] = process.argv.slice(2);
-if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-  console.error('Uso: npm run admin:create -- email@exemplo.com "Nome"');
-  process.exit(1);
+// Cria (ou atualiza) um administrador. Pede nome, e-mail e senha no terminal.
+// Também aceita: npm run admin:create -- email@exemplo.com "Nome"   e   ADMIN_PASSWORD=... (uso não interativo)
+
+function ask(q: string): Promise<string> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  return rl.question(q).finally(() => rl.close());
 }
 
+// Leitura sem eco usando modo raw: funciona no PowerShell, CMD, macOS e Linux.
 function askHidden(q: string): Promise<string> {
-  return new Promise((resolve) => {
-    const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
-    const w = (rl as any)._writeToOutput;
-    (rl as any)._writeToOutput = (s: string) => { if (s.startsWith(q)) w.call(rl, s); };
-    rl.question(q, (a) => { rl.close(); process.stdout.write("\n"); resolve(a); });
+  return new Promise((resolve, reject) => {
+    const stdin = process.stdin;
+    if (!stdin.isTTY) return reject(new Error("Terminal não interativo: defina ADMIN_PASSWORD."));
+    process.stdout.write(q);
+    let value = "";
+    stdin.setRawMode(true);
+    stdin.resume();
+    stdin.setEncoding("utf8");
+    const onData = (chunk: string) => {
+      for (const ch of chunk) {
+        if (ch === "\r" || ch === "\n") {
+          stdin.setRawMode(false);
+          stdin.pause();
+          stdin.off("data", onData);
+          process.stdout.write("\n");
+          return resolve(value);
+        }
+        if (ch === "\u0003") { process.stdout.write("\n"); process.exit(130); } // Ctrl+C
+        if (ch === "\u007f" || ch === "\b") value = value.slice(0, -1);
+        else if (ch >= " ") value += ch;
+      }
+    };
+    stdin.on("data", onData);
   });
 }
 
-const pw = process.env.ADMIN_PASSWORD ?? (await askHidden("Senha (mín. 12 caracteres): "));
-if (pw.length < 12) {
-  console.error("Senha curta demais (mínimo 12 caracteres).");
+const [argEmail, argName] = process.argv.slice(2);
+const email = (argEmail ?? (await ask("E-mail: "))).trim().toLowerCase();
+if (!/^\S+@\S+\.\S+$/.test(email)) { console.error("E-mail inválido."); process.exit(1); }
+const name = (argName ?? (await ask("Nome: "))).trim();
+if (name.length < 2) { console.error("Informe o nome."); process.exit(1); }
+
+let pw = process.env.ADMIN_PASSWORD;
+if (!pw) {
+  pw = await askHidden("Senha (mín. 12 caracteres): ");
+  if (pw !== (await askHidden("Repita a senha: "))) { console.error("As senhas não conferem."); process.exit(1); }
+}
+if (pw.length < 12) { console.error("Senha curta demais (mínimo 12 caracteres)."); process.exit(1); }
+
+const existing = (await db().query("SELECT id, role FROM users WHERE lower(email)=$1", [email])).rows[0];
+if (existing && existing.role !== "ADMIN" && process.env.PROMOTE !== "yes") {
+  // um cliente nunca é promovido por engano
+  console.error("Já existe uma conta de CLIENTE com esse e-mail. Para promovê-la a ADMIN rode com PROMOTE=yes.");
   process.exit(1);
 }
-await db().query(
-  `INSERT INTO admins (email, name, password_hash) VALUES ($1,$2,$3)
-   ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, name = EXCLUDED.name`,
-  [email.toLowerCase(), name, await hashPassword(pw)],
-);
-// trocar a senha invalida as sessões abertas
-await db().query("DELETE FROM sessions WHERE admin_id = (SELECT id FROM admins WHERE email=$1)", [email.toLowerCase()]);
-console.log(`Admin ${email} criado/atualizado.`);
+
+const hash = await hashPassword(pw);
+if (existing) {
+  await db().query("UPDATE users SET name=$2, password_hash=$3, role='ADMIN', is_active=true, updated_at=now() WHERE id=$1", [existing.id, name, hash]);
+  await db().query("DELETE FROM sessions WHERE user_id=$1", [existing.id]); // trocar a senha encerra as sessões abertas
+  console.log(`Administrador ${email} atualizado.`);
+} else {
+  await db().query("INSERT INTO users (email, name, password_hash, role) VALUES ($1,$2,$3,'ADMIN')", [email, name, hash]);
+  console.log(`Administrador ${email} criado.`);
+}
 await db().end();

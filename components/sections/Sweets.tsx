@@ -1,9 +1,11 @@
 import { useState } from "react";
+import type { GoFn } from "@/lib/types";
 import { photos } from "@/data/photos";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Title } from "@/components/ui/Title";
+import { useSite } from "@/lib/site";
 
 const boxSizes = ["24 unidades", "50 unidades"];
 const flavors = [
@@ -12,7 +14,8 @@ const flavors = [
   ["Ninho", "Leite Ninho e toque de baunilha"],
 ];
 
-export function Sweets() {
+export function Sweets({ go }: { go: GoFn }) {
+  const { setDraft } = useSite();
   const [sweetCount, setSweetCount] = useState("24 unidades");
   const [cupCount, setCupCount] = useState(10);
   return (
@@ -41,7 +44,7 @@ export function Sweets() {
                 <small>{description}</small>
               </div>
             ))}
-            <Button>Solicitar orçamento · {sweetCount} <Icon name="arrow" size={18} /></Button>
+            <Button onClick={() => { setDraft({ productType: "Doces", idea: `Caixa com ${sweetCount}.` }); go("orcamento"); }}>Solicitar orçamento · {sweetCount} <Icon name="arrow" size={18} /></Button>
           </div>
         </div>
       </section>
@@ -57,7 +60,7 @@ export function Sweets() {
             <Button variant="ghost" onClick={() => setCupCount(cupCount + 5)}><Icon name="plus" /></Button>
             <span>unidades</span>
           </div>
-          <Button variant="light">Montar meu pedido <Icon name="arrow" size={18} /></Button>
+          <Button variant="light" onClick={() => { setDraft({ productType: "Cupcakes", idea: `${cupCount} cupcakes.` }); go("orcamento"); }}>Montar meu pedido <Icon name="arrow" size={18} /></Button>
         </div>
         <img src={photos.cupcake} alt="Cupcake de chocolate com acabamento premium" />
       </section>
