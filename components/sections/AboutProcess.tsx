@@ -2,24 +2,32 @@ import { photos } from "@/data/photos";
 import { steps } from "@/data/steps";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Title } from "@/components/ui/Title";
+import { useSite } from "@/lib/site";
 
 const timeline = ["Início da confeitaria", "Crescimento", "Personalização", "Experiência atual"];
 
 export function AboutProcess() {
+  const { c } = useSite();
+  const pillars = [["Missão", c("about.mission")], ["Visão", c("about.vision")], ["Valores", c("about.values")], ["Propósito", c("about.purpose")]].filter(([, t]) => t);
   return (
     <>
       <section id="sobre" className="about-section">
         <div className="about-copy">
           <SectionHeader
-            eyebrow="NOSSA HISTÓRIA"
-            title={<>Feito para transformar<br />momentos em <em>memórias.</em></>}
-            text="Desde 2019, a Graziela Pires Confeitaria une técnica, afeto e olhar artístico para criar bolos e doces personalizados em Foz do Iguaçu."
+            eyebrow={c("about.eyebrow")}
+            title={<>{c("about.title1")} <em>{c("about.title2")}</em></>}
+            text={c("about.history")}
           />
-          <blockquote>“Cada bolo carrega uma história. Nosso trabalho é torná-la ainda mais bonita — e deliciosa.”</blockquote>
-          <span className="signature">Graziela Pires</span>
+          {pillars.length > 0 && (
+            <div className="about-pillars">
+              {pillars.map(([t, text]) => <div key={t}><strong>{t}</strong><p>{text}</p></div>)}
+            </div>
+          )}
+          {c("about.quote") && <blockquote>“{c("about.quote")}”</blockquote>}
+          {c("about.signature") && <span className="signature">{c("about.signature")}</span>}
         </div>
         <div className="about-image">
-          <img src={photos.baker} alt="Processo artesanal de criação de um bolo" />
+          <img src={c("about.image") || photos.baker} alt="Processo artesanal de criação de um bolo" />
           <div className="year-mark"><strong>2019</strong><span>ONDE TUDO COMEÇOU</span></div>
         </div>
         <div className="timeline-mini">

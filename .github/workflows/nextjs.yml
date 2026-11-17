@@ -77,8 +77,8 @@ jobs:
         env:
           STATIC_EXPORT: "true"
         run: |
-          # a API exige servidor; fica fora do export estático do GitHub Pages
-          rm -rf app/api
+          # API e painel exigem servidor; ficam fora do export estático do GitHub Pages
+          rm -rf app/api app/admin
           ${{ steps.detect-package-manager.outputs.runner }} next build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

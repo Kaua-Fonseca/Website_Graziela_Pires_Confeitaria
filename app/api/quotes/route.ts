@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { currentUser } from "@/lib/server/auth";
 import { db } from "@/lib/server/db";
 import { clientIp, fail, isResponse, json, parse, sameOrigin } from "@/lib/server/http";
 import { hit } from "@/lib/server/rate-limit";
@@ -19,10 +20,11 @@ export async function POST(req: Request) {
   const body = await parse(req, schema);
   if (isResponse(body)) return body;
 
+  const user = await currentUser();
   const { rows } = await db().query(
-    `INSERT INTO quotes (name, whatsapp, desired_date, product_type, idea)
-     VALUES ($1,$2,$3,$4,$5) RETURNING id`,
-    [body.name, body.whatsapp, body.desiredDate || null, body.productType || null, body.idea],
+    `INSERT INTO quotes (name, whatsapp, desired_date, product_type, idea, user_id)
+     VALUES ($1,$2,$3,$4,$5,$6) RETURNING id`,
+    [body.name, body.whatsapp, body.desiredDate || null, body.productType || null, body.idea, user?.id ?? null],
   );
   return json({ id: rows[0].id }, 201);
 }

@@ -4,13 +4,15 @@ type LinkProps = {
   children: ReactNode;
   onClick?: () => void;
   className?: string;
+  current?: boolean;
 };
 
-export function Link({ children, onClick, className = "" }: LinkProps) {
+export function Link({ children, onClick, className = "", current }: LinkProps) {
   return (
     <a
       href="#"
-      className={className}
+      className={`${className} ${current ? "active" : ""}`.trim()}
+      aria-current={current ? "page" : undefined}
       onClick={(event) => {
         event.preventDefault();
         onClick?.();

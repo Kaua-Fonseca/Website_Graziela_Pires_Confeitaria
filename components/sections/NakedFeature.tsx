@@ -5,9 +5,12 @@ import { sizes, type SizeKey } from "@/data/sizes";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { useSite } from "@/lib/site";
 
 export function NakedFeature({ go }: { go: GoFn }) {
+  const { products } = useSite();
   const [size, setSize] = useState<SizeKey>("P");
+  const naked = products.find((p) => p.categorySlug === "naked-cake");
   return (
     <section className="naked-section">
       <div className="naked-image">
@@ -36,7 +39,7 @@ export function NakedFeature({ go }: { go: GoFn }) {
           <span><small>Diâmetro</small>{sizes[size].diameter}</span>
           <span><small>A partir de</small>{sizes[size].price}</span>
         </div>
-        <Button onClick={() => go("produto")}>Personalizar meu Naked Cake <Icon name="arrow" size={18} /></Button>
+        <Button onClick={() => (naked ? go("produto", undefined, naked.slug) : go("orcamento"))}>Personalizar meu Naked Cake <Icon name="arrow" size={18} /></Button>
         <p className="fine-print">* Valores base. O orçamento final varia conforme sabores e decoração.</p>
       </div>
     </section>
