@@ -26,6 +26,11 @@ export default defineConfig({
             normalizedImporter.includes("/lib/server/")
           );
 
+        const isMediaImport =
+          normalizedSource === "@/lib/server/media" ||
+          normalizedSource.endsWith("/lib/server/media") ||
+          normalizedSource.endsWith("/lib/server/media.ts");
+
         const isMailImport =
           normalizedSource === "@/lib/server/mail" ||
           normalizedSource.endsWith("/lib/server/mail") ||
@@ -35,7 +40,7 @@ export default defineConfig({
             normalizedImporter.includes("/lib/server/")
           );
 
-        if (!isDatabaseImport && !isMailImport) {
+        if (!isDatabaseImport && !isMailImport && !isMediaImport) {
           return null;
         }
 
@@ -43,7 +48,9 @@ export default defineConfig({
           new URL(
             isDatabaseImport
               ? "./lib/server/db.cloudflare.ts"
-              : "./lib/server/mail.cloudflare.ts",
+              : isMailImport
+                ? "./lib/server/mail.cloudflare.ts"
+                : "./lib/server/media.cloudflare.ts",
             import.meta.url,
           ),
         );
