@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   }),
   env: { NEXT_PUBLIC_STATIC_EXPORT: staticExport ? "true" : "false" },
   images: { unoptimized: true },
-  serverExternalPackages: ["@node-rs/argon2", "pg"],
+  serverExternalPackages: ["pg"],
 };
 
 export default nextConfig;
