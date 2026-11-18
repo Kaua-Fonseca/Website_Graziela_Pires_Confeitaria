@@ -12,7 +12,7 @@ const results = [];
 class Client {
   cookie = "";
   async req(method, path, body, extra = {}) {
-    const headers = { origin: BASE, ...(this.cookie && { cookie: this.cookie }), ...extra.headers };
+    const headers = { origin: new URL(BASE).origin, ...(this.cookie && { cookie: this.cookie }), ...extra.headers };
     let payload = body;
     if (body && !(body instanceof FormData)) { headers["content-type"] = "application/json"; payload = JSON.stringify(body); }
     const res = await fetch(BASE + path, { method, headers, body: payload, redirect: "manual" });
