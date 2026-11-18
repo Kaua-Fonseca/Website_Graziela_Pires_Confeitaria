@@ -1,50 +1,40 @@
-
 import { env } from "cloudflare:workers";
-import {
-  Client,
-  type QueryResult,
-  type QueryResultRow,
-} from "pg";
+import { Client, type QueryResult, type QueryResultRow } from "pg";
 
-type CloudflareClient = Client & {
-  release: () => void;
-};
-
+type CloudflareClient = Client & { release: () => void };
 type CloudflareDatabase = {
-  query<R extends QueryResultRow = any>(
-    text: string,
-    values?: any[],
-  ): Promise<QueryResult<R>>;
-
+  query<R extends QueryResultRow = any>(text: string, values?: any[]): Promise<QueryResult<R>>;
   connect(): Promise<CloudflareClient>;
 };
 
 async function createClient(): Promise<CloudflareClient> {
   const client = new Client({
     connectionString: env.HYPERDRIVE.connectionString,
-    connectionTimeoutMillis: 10000,
-    query_timeout: 15000,
+    connectionTimeoutMillis: 10_000,
+    query_timeout: 15_000,
   });
 
   await client.connect();
 
-  // Compatibilidade com o padrão Pool do node-postgres.
-  // O Hyperdrive gerencia o pool de conexões.
+  // O Hyperdrive mantém o pool no lado da Cloudflare. Encerrar o Client
+  // devolve a conexão gerenciada ao Hyperdrive.
   return Object.assign(client, {
-    release: () => {},
+    release: () => {
+      void client.end().catch((error) => console.error("[DATABASE RELEASE]", error));
+    },
   });
 }
 
 export function db(): CloudflareDatabase {
   return {
-    async query<R extends QueryResultRow = any>(
-      text: string,
-      values?: any[],
-    ): Promise<QueryResult<R>> {
+    async query<R extends QueryResultRow = any>(text: string, values?: any[]): Promise<QueryResult<R>> {
       const client = await createClient();
-      return client.query<R>(text, values);
+      try {
+        return await client.query<R>(text, values);
+      } finally {
+        await client.end();
+      }
     },
-
     connect: createClient,
   };
 }
