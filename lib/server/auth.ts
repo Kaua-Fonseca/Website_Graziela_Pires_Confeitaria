@@ -30,8 +30,12 @@ export async function createSession(userId: string) {
 export async function destroySession() {
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;
-  if (token) await db().query("DELETE FROM sessions WHERE id=$1", [sha(token)]);
-  jar.delete(COOKIE);
+  try {
+    if (token) await db().query("DELETE FROM sessions WHERE id=$1", [sha(token)]);
+  } finally {
+    // Mesmo se o banco estiver indisponível, remove o cookie do navegador.
+    jar.delete(COOKIE);
+  }
 }
 
 /** Encerra todas as sessões do usuário, exceto (opcionalmente) a atual. */
