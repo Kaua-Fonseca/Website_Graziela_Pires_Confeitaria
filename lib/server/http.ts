@@ -5,20 +5,29 @@ export const json = (data: unknown, status = 200) => NextResponse.json(data, { s
 export const fail = (message: string, status = 400) => json({ error: message }, status);
 
 export function clientIp(req: Request): string {
+  // CF-Connecting-IP é definido pela borda da Cloudflare.
+  const cfIp = req.headers.get("cf-connecting-ip")?.trim();
+  if (cfIp && cfIp.length <= 64) return cfIp;
+
   if (process.env.TRUST_PROXY === "true") {
     const xff = req.headers.get("x-forwarded-for");
-    if (xff) return xff.split(",")[0].trim();
+    const first = xff?.split(",")[0]?.trim();
+    if (first && first.length <= 64) return first;
   }
   return "unknown";
 }
 
 /** Bloqueia requisições mutáveis vindas de outra origem (defesa extra além do SameSite). */
 export function sameOrigin(req: Request): boolean {
+  const expected = new URL(req.url).origin;
   const origin = req.headers.get("origin");
-  if (!origin) return true; // clientes não-navegador (curl) não enviam Origin
-  const host = req.headers.get("host");
+  const referer = req.headers.get("referer");
+
   try {
-    return new URL(origin).host === host;
+    if (origin) return new URL(origin).origin === expected;
+    if (referer) return new URL(referer).origin === expected;
+    // Requisições mutáveis sem Origin/Referer não são aceitas.
+    return false;
   } catch {
     return false;
   }
