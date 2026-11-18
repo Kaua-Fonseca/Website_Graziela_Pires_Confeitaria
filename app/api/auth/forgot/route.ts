@@ -63,7 +63,6 @@ export async function POST(req: Request) {
 
     const u = rows[0];
 
-    console.log("[FORGOT] Conta encontrada:", !!u);
 
     // Mantém a mesma resposta para contas existentes ou inexistentes.
     if (!u) {
@@ -87,8 +86,6 @@ export async function POST(req: Request) {
 
     // Tenta enviar o e-mail e registra o resultado no terminal.
     try {
-      console.log("[FORGOT] Tentando enviar e-mail...");
-
       await sendMail(
         u.email,
         "Redefinição de senha — Graziela Pires Confeitaria",
@@ -100,14 +97,13 @@ ${siteUrl()}/#/redefinir?token=${token}
 Se você não pediu isso, ignore este e-mail.`
       );
 
-      console.log("[FORGOT] E-mail enviado com sucesso!");
     } catch (error) {
-      console.error("[FORGOT] Erro no envio:", error);
+      console.error("[PASSWORD RESET EMAIL]", error);
     }
 
     return json({ message: MSG });
   } catch (error) {
-    console.error("[FORGOT] Erro na recuperação:", error);
+    console.error("[PASSWORD RESET]", error);
 
     return fail("Não foi possível processar a solicitação.", 500);
   }
