@@ -15,7 +15,7 @@ export function AdminLogin() {
     setBusy(true); setError("");
     try {
       const res = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
-      const data = await res.json().catch(() => ({}));
+      const data = (await res.json().catch(() => ({}))) as { error?: string; role?: string };
       if (!res.ok) { setError(data.error ?? "Não foi possível entrar."); return; }
       if (data.role !== "ADMIN") {
         await fetch("/api/auth/logout", { method: "POST" });

@@ -10,13 +10,16 @@ dist/
 *-debug.log*
 logs/
 *.log
+*.pem
+*.key
 .claude-replay.*
 .tmp-*
 /.figma/design-context/
 
-# Platform-managed agent state
 /.plugins/
 /.opencode-skills/
 
-# imagens enviadas pelo painel
 /uploads/
+.vinext/
+.cloudflare/
+.dev.vars
