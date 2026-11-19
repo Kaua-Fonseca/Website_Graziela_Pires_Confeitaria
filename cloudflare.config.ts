@@ -4,7 +4,7 @@ import { createWorkersResponseStoreServiceBindingConfig } from "@vinext/cloudfla
 const responseStore = await createWorkersResponseStoreServiceBindingConfig({
   worker: {
     name: "graziela-pires-confeitaria-response-store",
-    compatibilityDate: "2026-11-17",
+    compatibilityDate: "2026-11-18",
   },
   bucket: "graziela-pires-confeitaria-response-store-cache-bodies",
 });
