@@ -16,7 +16,13 @@ export default defineConfig({
     ...responseStore.applicationWorker,
     name: "graziela-pires-confeitaria",
     entrypoint: "vinext/server/fetch-handler",
-    compatibilityDate: "2026-11-17",
+    compatibilityDate: "2026-11-18",
+    compatibilityFlags: ["nodejs_compat"],
+    observability: {
+      enabled: true,
+      logs: { enabled: true, headSamplingRate: 1 },
+      traces: { enabled: true, headSamplingRate: 0.05 },
+    },
     assets: {
       htmlHandling: "none",
       notFoundHandling: "none",
