@@ -36,7 +36,9 @@ export const POST = withAdmin<{ id: string }>(async (req, { params }) => {
       [id, newFilename, up.name, up.mime, up.buf.length],
     );
     await client.query("COMMIT");
-    await removeStored(oldFilename).catch((error) => console.error("[OLD MEDIA CLEANUP]", error));
+    if (oldFilename) {
+      await removeStored(oldFilename).catch((error) => console.error("[OLD MEDIA CLEANUP]", error));
+    }
     return json(rows[0]);
   } catch (error) {
     await client.query("ROLLBACK").catch(() => {});
