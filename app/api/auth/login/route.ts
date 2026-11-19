@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createSession, hashPassword, verifyPassword } from "@/lib/server/auth";
 import { db } from "@/lib/server/db";
 import { clientIp, fail, isResponse, json, parse, sameOrigin } from "@/lib/server/http";
-import { cleanup, hit, reset } from "@/lib/server/rate-limit";
+import { hit, reset } from "@/lib/server/rate-limit";
 import { emailSchema } from "@/lib/server/schemas";
 
 const schema = z.object({ email: emailSchema, password: z.string().min(1).max(200) });
