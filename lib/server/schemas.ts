@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const imageUrl = z.string().trim().max(500).refine((v) => v === "" || /^(https?:\/\/|\/)/.test(v), "URL inválida").default("");
+const imageUrl = z.string().trim().max(500).refine((v) => v === "" || /^https:\/\/[^\s]+$/.test(v) || /^\/api\/media\/[1-9]\d*$/.test(v), "Use uma URL HTTPS ou uma imagem da biblioteca").default("");
 
 export const categorySchema = z.object({
   name: z.string().trim().min(2).max(80),
